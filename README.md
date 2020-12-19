@@ -1,3 +1,3 @@
 Running the application:
 
-mvn spring-boot:run
+`mvn spring-boot:run`
