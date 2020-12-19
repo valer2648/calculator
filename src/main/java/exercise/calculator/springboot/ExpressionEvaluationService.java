@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ExpressionEvaluationService {
-    @Cacheable("expression-results")
+    @Cacheable(value = "expressionResults")
     public double evaluate(String expressionStr) throws ExpressionValidationException {
         Expression expression = new Expression(expressionStr);
         return expression.evaluate();
