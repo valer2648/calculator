@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <script>
+            async function evaluateExpression(expression) {
+                result_span.textContent = "";
+                error_message_span.textContent = "";
+
+                let response = await fetch("/eval?expr=" + encodeURIComponent(expression));
+                if (response.ok) {
+                    result_span.textContent = await response.text();
+                } else {
+                    error_message_span.textContent = (await response.json()).message;
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <h2>Calculator</h2>
+        <input type="text" id="expression_input" placeholder="Enter expression..."/>
+        <button onclick="evaluateExpression(expression_input.value)">Evaluate</button>
+        <br/><br/>
+        Result: <span id="result_span"></span>
+        <br/><br/>
+        <span id="error_message_span" style="color:red;"></span>
+    </body>
+</html>
