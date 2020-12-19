@@ -3,11 +3,15 @@ package exercise.calculator.models;
 import exercise.calculator.exceptions.ExpressionValidationException;
 import exercise.calculator.models.operators.BinaryOperatorBase;
 import exercise.calculator.models.operators.OperatorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Stack;
 
 public class Expression {
-    private String trimmedExpressionStr;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Expression.class);
+
+    private final String trimmedExpressionStr;
 
     private final Stack<Double> operandsStack = new Stack<>();
     private final Stack<BinaryOperatorBase> operatorsStack = new Stack<>();
@@ -16,39 +20,11 @@ public class Expression {
         trimmedExpressionStr = expressionStr == null ? null : expressionStr.replaceAll("\\s", "");
     }
 
-    public String getTrimmedExpressionStr() {
-        return trimmedExpressionStr;
-    }
+    public double evaluate() throws ExpressionValidationException {
+        LOGGER.info(String.format("Evaluating expression '%s'", trimmedExpressionStr));
 
-    public void validate() throws ExpressionValidationException {
-        if (!Character.isDigit(trimmedExpressionStr.charAt(0))) {
-            throw new ExpressionValidationException("Expression must start with a digit");
-        }
+        validate();
 
-        if (!Character.isDigit(trimmedExpressionStr.charAt(trimmedExpressionStr.length() - 1))) {
-            throw new ExpressionValidationException("Expression must end with a digit");
-        }
-
-        for (int i = 1; i < trimmedExpressionStr.length() - 1; i++) {
-            char currentChar = trimmedExpressionStr.charAt(i);
-            if (!Character.isDigit(currentChar)) {
-                if (OperatorFactory.getInstance(currentChar) == null) {
-                    throw new ExpressionValidationException(
-                            String.format("Expression '%s' contains unknown character: %s at index %s",
-                                    trimmedExpressionStr, currentChar, i));
-                }
-
-                char previousChar = trimmedExpressionStr.charAt(i - 1);
-                if (!Character.isDigit(previousChar)) {
-                    throw new ExpressionValidationException(
-                            String.format("Expression '%s' contains 2 consecutive operators: %s%s at index %s",
-                                    trimmedExpressionStr, previousChar, currentChar, i - 1));
-                }
-            }
-        }
-    }
-
-    public double evaluate() {
         initEvaluationStacks();
         StringBuilder operandStringBuilder = new StringBuilder();
 
@@ -72,7 +48,50 @@ public class Expression {
 
         evaluateAllOperators();
 
-        return operandsStack.pop();
+        double result = operandsStack.pop();
+
+        LOGGER.info(String.format("Done evaluating expression '%s'. Result: %s", trimmedExpressionStr, result));
+
+        return result;
+    }
+
+    private void validate() throws ExpressionValidationException {
+        LOGGER.info(String.format("Validating expression '%s'", trimmedExpressionStr));
+
+        if (!Character.isDigit(trimmedExpressionStr.charAt(0))) {
+            String errorMsg = "Expression must start with a digit";
+            LOGGER.error(errorMsg);
+            throw new ExpressionValidationException(errorMsg);
+        }
+
+        if (!Character.isDigit(trimmedExpressionStr.charAt(trimmedExpressionStr.length() - 1))) {
+            String errorMsg = "Expression must end with a digit";
+            LOGGER.error(errorMsg);
+            throw new ExpressionValidationException(errorMsg);
+        }
+
+        for (int i = 1; i < trimmedExpressionStr.length() - 1; i++) {
+            char currentChar = trimmedExpressionStr.charAt(i);
+            if (!Character.isDigit(currentChar)) {
+                if (OperatorFactory.getInstance(currentChar) == null) {
+                    String errorMsg = String.format("Expression '%s' contains unknown character: %s at index %s",
+                            trimmedExpressionStr, currentChar, i);
+                    LOGGER.error(errorMsg);
+                    throw new ExpressionValidationException(errorMsg);
+                }
+
+                char previousChar = trimmedExpressionStr.charAt(i - 1);
+                if (!Character.isDigit(previousChar)) {
+                    String errorMsg = String.format(
+                            "Expression '%s' contains 2 consecutive operators: %s%s at index %s",
+                            trimmedExpressionStr, previousChar, currentChar, i - 1);
+                    LOGGER.error(errorMsg);
+                    throw new ExpressionValidationException(errorMsg);
+                }
+            }
+        }
+
+        LOGGER.info(String.format("Expression '%s' is valid", trimmedExpressionStr));
     }
 
     private void initEvaluationStacks() {

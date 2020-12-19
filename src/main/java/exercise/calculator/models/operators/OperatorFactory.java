@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OperatorFactory {
-    private static Map<Character, BinaryOperatorBase> operators;
+    private static final Map<Character, BinaryOperatorBase> operators;
 
     static {
         operators = new HashMap<>();

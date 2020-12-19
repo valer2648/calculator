@@ -1,7 +1,7 @@
 package exercise.calculator.models.operators;
 
 public abstract class BinaryOperatorBase {
-    private int priority;
+    private final int priority;
 
     public BinaryOperatorBase(int priority) {
         this.priority = priority;
