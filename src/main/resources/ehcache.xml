@@ -4,7 +4,7 @@
         xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core.xsd">
     <cache alias="expressionResults">
         <expiry>
-            <tti unit="minutes">1</tti>
+            <tti unit="minutes">10</tti>
         </expiry>
         <resources>
             <heap>2000</heap>
