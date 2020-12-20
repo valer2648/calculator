@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Controller
 public class CalculatorController {
     @Autowired
@@ -21,8 +23,10 @@ public class CalculatorController {
 
     @RequestMapping("/eval")
     @ResponseBody
-    public double evaluateExpression(@RequestParam(name = "expr") String expressionStr) {
-        //Trim expression for better caching
+    public double evaluateExpression(@RequestParam(name = "expr") String expressionStr, final HttpServletResponse response) {
+        response.setHeader("Cache-Control", "private, max-age=600");
+
+        //Trim expression for better server side caching
         String trimmedExpression = expressionStr.replaceAll("\\s", "");
         try {
             return expressionEvaluationService.evaluate(trimmedExpression);
